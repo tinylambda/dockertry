@@ -75,12 +75,11 @@ class Hadoop(Service):
         
         # 启动JournalNode进程
         if JOURNALNODE_SERVICE is not None:
-            DFS_JOURNALNODE_EDITS_DIR = self.ENV.get('DFS_JOURNALNODE_EDITS_DIR')
+            DFS_JOURNALNODE_EDITS_DIR = self.ENV.get('DFS_JOURNALNODE_EDITS_DIR') # like /data1/dfs/jn#hdfs:hdfs#755
             DFS_JOURNALNODE_EDITS_DIR_ARR = DFS_JOURNALNODE_EDITS_DIR.split(',')
             for dfs_journalnode_edits_dir in DFS_JOURNALNODE_EDITS_DIR_ARR:
-                pathname, owner, perm = dfs_journalnode_edits_dir.split('#')
-                if not self.pathexists(pathname):
-                    self.makedir((pathname, owner, perm))
+                if not self.pathexists(dfs_journalnode_edits_dir):
+                    self.makedir((dfs_journalnode_edits_dir, 'hdfs:hdfs', '755'))
             JOURNALNODE_START_CMD = 'service hadoop-hdfs-journalnode restart'
             statusoutput = self.execute_cmd(JOURNALNODE_START_CMD)
             if statusoutput[0] == 0:
@@ -94,9 +93,8 @@ class Hadoop(Service):
             DFS_NAMENODE_NAME_DIR = self.ENV.get('DFS_NAMENODE_NAME_DIR', None) 
             DFS_NAMENODE_NAME_DIR_ARR = DFS_NAMENODE_NAME_DIR.split(',')
             for dfs_namenode_name_dir in DFS_NAMENODE_NAME_DIR_ARR:
-                pathname, owner, perm = dfs_namenode_name_dir.split('#')
-                if not self.pathexists(pathname):
-                    self.makedir((pathname, owner, perm))
+                if not self.pathexists(dfs_namenode_name_dir):
+                    self.makedir((dfs_namenode_name_dir, 'hdfs:hdfs', '700'))
             
             if NAMENODE_SERVICE.upper() == 'MASTER':
                 NAMENODE_FORMATED = '/root/state/namenode_formated.log'

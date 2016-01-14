@@ -39,7 +39,7 @@ class Service(object):
         return commands.getstatusoutput(cmd)
     
     def get_now(self):
-        return datetime.datetime.now()
+        return str(datetime.datetime.now())
     
     def check_env(self):
         # 配置需要一些必要的环境变量来渲染配置文件，如果这些环境变量不存在，则不能正确渲染配置文件，故直接退出;
