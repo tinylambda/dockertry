@@ -96,6 +96,7 @@ class Hadoop(Service):
                 if not self.pathexists(dfs_namenode_name_dir):
                     self.makedir((dfs_namenode_name_dir, 'hdfs:hdfs', '700'))
             
+            ZKFC_FORMATED = '/root/state/zkfc_formated.log'
             if NAMENODE_SERVICE.upper() == 'MASTER':
                 NAMENODE_FORMATED = '/root/state/namenode_formated.log'
                 if not self.pathexists(NAMENODE_FORMATED): # 如果namenode未被初始化，先执行格式化操作
@@ -119,7 +120,6 @@ class Hadoop(Service):
                 # 如果格式化Namenode正常，则启动该节点的ZKFC服务，以用来自动切换坏掉的Namenode服务
                 # 首先，要判断是否已经在Zookeeper中格式化了存储结构，如果没有需要格式化一下，本操作规定只在master
                 # 节点上来做，因为Zookeeper的数据是共享的
-                ZKFC_FORMATED = '/root/state/zkfc_formated.log'
                 if not self.pathexists(ZKFC_FORMATED):
                     self.success('ZKFC initializing...')
                     ZKFC_FORMAT_CMD = 'hdfs zkfc -formatZK'
