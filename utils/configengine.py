@@ -28,3 +28,4 @@ class ConfigEngine(object):
 if __name__ == '__main__':
     configEngine = ConfigEngine()
     configEngine.configure()
+    configEngine.waiting()
