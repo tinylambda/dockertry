@@ -75,7 +75,7 @@ class Hadoop(Service):
         
         # 启动JournalNode进程
         if JOURNALNODE_SERVICE is not None:
-            DFS_JOURNALNODE_EDITS_DIR = self.ENV.get('DFS_JOURNALNODE_EDITS_DIR') # like /data1/dfs/jn#hdfs:hdfs#755
+            DFS_JOURNALNODE_EDITS_DIR = self.ENV.get('DFS_JOURNALNODE_EDITS_DIR') # like /data1/dfs/jn
             DFS_JOURNALNODE_EDITS_DIR_ARR = DFS_JOURNALNODE_EDITS_DIR.split(',')
             for dfs_journalnode_edits_dir in DFS_JOURNALNODE_EDITS_DIR_ARR:
                 if not self.pathexists(dfs_journalnode_edits_dir):
@@ -129,6 +129,17 @@ class Hadoop(Service):
                             state_file.write(self.get_now())
                     else:
                         self.fail('Failed to init ZKFC: ' + str(statusoutput))                        
+                
+                # 建立相关HDFS的目录，并设置相应权限
+                self.execute_cmd('sudo -u hdfs hadoop fs -mkdir /tmp')
+                self.execute_cmd('sudo -u hdfs hadoop fs -chmod -R 1777 /tmp')
+                self.execute_cmd('sudo -u hdfs hadoop fs -mkdir -p /user/history')
+                self.execute_cmd('sudo -u hdfs hadoop fs -chmod -R 1777 /user/history')
+                self.execute_cmd('sudo -u hdfs hadoop fs -chown mapred:hadoop /user/history')
+                self.execute_cmd('sudo -u hdfs hadoop fs -mkdir -p /var/log/hadoop-yarn')
+                self.execute_cmd('sudo -u hdfs hadoop fs -chown yarn:mapred /var/log/hadoop-yarn')
+                self.execute_cmd('sudo -u hdfs hadoop fs -mkdir  /user/hive')
+                self.execute_cmd('sudo -u hdfs hadoop fs -chown hive /user/hive')
                 
             elif NAMENODE_SERVICE.upper() == 'STANDBY':
                 self.execute_cmd('sudo -u hdfs hdfs namenode -bootstrapStandby')
