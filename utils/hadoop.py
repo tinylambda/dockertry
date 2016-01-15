@@ -148,9 +148,8 @@ class Hadoop(Service):
             # 至此，ZKFC已经格式化完毕，需要启动ZKFC服务，由于ACTIVE和STANDBY都需要启动ZKFC服务，所以将其放置到外层
             ZKFC_START_CMD = 'service hadoop-hdfs-zkfc restart'
             statusoutput = self.execute_cmd(ZKFC_START_CMD)
-            if statusoutput[0] == 0: # 如果初始化操作正常，那么打上相应的已经初始化的标记
-                with open(ZKFC_FORMATED, 'w') as state_file:
-                    state_file.write(self.get_now())
+            if statusoutput[0] == 0:
+                self.success(str(statusoutput))
             else:
                 self.fail('Failed to start ZKFC: ' + str(statusoutput))             
         
