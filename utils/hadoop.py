@@ -142,4 +142,28 @@ class Hadoop(Service):
                     state_file.write(self.get_now())
             else:
                 self.fail('Failed to start ZKFC: ' + str(statusoutput))             
-
+        
+        if DATANODE_SERVICE is not None:
+            # 在到达这步的时候，我们必须确定NameNode的相关服务都已经搞定了，这一步只需要建立相关目录、设置好拥有者和权限位之后启动服务即可
+            # 此步骤可以进一步优化，比如根据挂载点来动态确定数据目录等
+            DFS_DATANODE_DATA_DIR = self.ENV.get('DFS_DATANODE_DATA_DIR')
+            DFS_DATANODE_DATA_DIR_ARR = DFS_DATANODE_DATA_DIR.split(',')
+            for dfs_datanode_data_dir in DFS_DATANODE_DATA_DIR_ARR:
+                if not self.pathexists(dfs_datanode_data_dir):
+                    self.makedir((dfs_datanode_data_dir, 'hdfs:hdfs', '700'))
+            
+            DATANODE_START_CMD = 'service hadoop-hdfs-datanode restart'
+            statusoutput = self.execute_cmd(DATANODE_START_CMD)
+            if statusoutput[0] == 0:
+                self.success(str(statusoutput))
+            else:
+                self.fail('Failed to start datanode: ' + str(statusoutput))
+        
+        if RESOURCEMANAGER_SERVICE is not None:
+            pass
+        
+        if NODEMANAGER_SERVICE is not None:
+            pass
+        
+        if HISTORY_SERVICE is not None:
+            pass
