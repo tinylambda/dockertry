@@ -70,7 +70,7 @@ class Hadoop(Service):
         DATANODE_SERVICE = self.ENV.get('DATANODE_SERVICE', None) # hostname like above
         RESOURCEMANAGER_SERVICE = self.ENV.get('RESOURCEMANAGER_SERVICE', None) # like above
         NODEMANAGER_SERVICE = self.ENV.get('NODEMANAGER_SERVICE', None)
-        HISTORY_SERVICE = self.ENV.get('HISTORY_SERVICE', None)
+        JOBHISTORY_SERVICE = self.ENV.get('JOBHISTORY_SERVICE', None)
         JOURNALNODE_SERVICE = self.ENV.get('JOURNALNODE_SERVICE', None)
         
         # 启动JournalNode进程
@@ -78,8 +78,7 @@ class Hadoop(Service):
             DFS_JOURNALNODE_EDITS_DIR = self.ENV.get('DFS_JOURNALNODE_EDITS_DIR') # like /data1/dfs/jn
             DFS_JOURNALNODE_EDITS_DIR_ARR = DFS_JOURNALNODE_EDITS_DIR.split(',')
             for dfs_journalnode_edits_dir in DFS_JOURNALNODE_EDITS_DIR_ARR:
-                if not self.pathexists(dfs_journalnode_edits_dir):
-                    self.makedir((dfs_journalnode_edits_dir, 'hdfs:hdfs', '755'))
+                self.makedir((dfs_journalnode_edits_dir, 'hdfs:hdfs', '755'))
             JOURNALNODE_START_CMD = 'service hadoop-hdfs-journalnode restart'
             statusoutput = self.execute_cmd(JOURNALNODE_START_CMD)
             if statusoutput[0] == 0:
@@ -93,8 +92,7 @@ class Hadoop(Service):
             DFS_NAMENODE_NAME_DIR = self.ENV.get('DFS_NAMENODE_NAME_DIR', None) 
             DFS_NAMENODE_NAME_DIR_ARR = DFS_NAMENODE_NAME_DIR.split(',')
             for dfs_namenode_name_dir in DFS_NAMENODE_NAME_DIR_ARR:
-                if not self.pathexists(dfs_namenode_name_dir):
-                    self.makedir((dfs_namenode_name_dir, 'hdfs:hdfs', '700'))
+                self.makedir((dfs_namenode_name_dir, 'hdfs:hdfs', '700'))
             
             ZKFC_FORMATED = '/root/state/zkfc_formated.log'
             ZKFC_START_CMD = 'service hadoop-hdfs-zkfc restart'
@@ -163,8 +161,7 @@ class Hadoop(Service):
             DFS_DATANODE_DATA_DIR = self.ENV.get('DFS_DATANODE_DATA_DIR')
             DFS_DATANODE_DATA_DIR_ARR = DFS_DATANODE_DATA_DIR.split(',')
             for dfs_datanode_data_dir in DFS_DATANODE_DATA_DIR_ARR:
-                if not self.pathexists(dfs_datanode_data_dir):
-                    self.makedir((dfs_datanode_data_dir, 'hdfs:hdfs', '700'))
+                self.makedir((dfs_datanode_data_dir, 'hdfs:hdfs', '700'))
             
             DATANODE_START_CMD = 'service hadoop-hdfs-datanode restart'
             statusoutput = self.execute_cmd(DATANODE_START_CMD)
@@ -174,10 +171,38 @@ class Hadoop(Service):
                 self.fail('Failed to start datanode: ' + str(statusoutput))
         
         if RESOURCEMANAGER_SERVICE is not None:
-            pass
+            # 设置并启动YARN的资源管理节点，
+            RESOURCEMANAGER_START_CMD = 'service hadoop-yarn-resourcemanager restart'
+            statusoutput = self.execute_cmd(RESOURCEMANAGER_START_CMD)
+            if statusoutput[0] == 0:
+                self.success(str(statusoutput))
+            else:
+                self.fail('Failed to start resourcemanager service: ' + str(statusoutput))
         
         if NODEMANAGER_SERVICE is not None:
-            pass
+            # 创建nodemanager所需要的本地工作目录和日志目录，设置好相应的拥有者和权限之后，启动服务
+            YARN_NODEMANAGER_LOCAL_DIRS = self.ENV.get('YARN_NODEMANAGER_LOCAL_DIRS')
+            YARN_NODEMANAGER_LOCAL_DIRS_ARR = YARN_NODEMANAGER_LOCAL_DIRS.split(',')
+            for yarn_nodemanager_local_dir in YARN_NODEMANAGER_LOCAL_DIRS_ARR:
+                self.makedir((yarn_nodemanager_local_dir, 'yarn:yarn', '755'))
+            
+            YARN_NODEMANAGER_LOG_DIRS = self.ENV.get('YARN_NODEMANAGER_LOG_DIRS')
+            YARN_NODEMANAGER_LOG_DIRS_ARR = YARN_NODEMANAGER_LOG_DIRS.split(',')
+            for yarn_nodemanager_log_dir in YARN_NODEMANAGER_LOG_DIRS_ARR:
+                self.makedir((yarn_nodemanager_log_dir, 'yarn:yarn', '755'))
+            
+            NODEMANAGER_START_CMD = 'service hadoop-yarn-nodemanager restart'
+            statusoutput = self.execute_cmd(NODEMANAGER_START_CMD)
+            if statusoutput[0] == 0:
+                self.success(str(statusoutput))
+            else:
+                self.fail('Failed to start nodemanager service: ' + str(statusoutput))
         
-        if HISTORY_SERVICE is not None:
-            pass
+        if JOBHISTORY_SERVICE is not None:
+            # 启动MapReduce Jobhistory服务
+            JOBHISTORY_START_CMD = 'service hadoop-mapreduce-historyserver restart'
+            statusoutput = self.execute_cmd(JOBHISTORY_START_CMD)
+            if statusoutput[0] == 0:
+                self.success(str(statusoutput))
+            else:
+                self.fail('Failed to start JOBHISTORY service: ' + str(statusoutput))
