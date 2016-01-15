@@ -36,6 +36,7 @@ class Service(object):
         return os.path.exists(pathname)
     
     def execute_cmd(self, cmd):
+        self.success('Executing CMD: [%s] ...' % cmd)
         return commands.getstatusoutput(cmd)
     
     def get_now(self):
