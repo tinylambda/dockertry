@@ -21,9 +21,9 @@ lambda:5000/hadoop-base:x8
 
 ##################################################
 DOCKERVMDIR=/data/docker-vm
-mkdir -p $DOCKVMDIR
-mkdir -p $DOCKVMDIR/tmp && chmod 1777 $DOCKVMDIR/tmp
-mkdir -p $DOCKVMDIR/state
+mkdir -p $DOCKERVMDIR
+mkdir -p $DOCKERVMDIR/tmp && chmod 1777 $DOCKVMDIR/tmp
+mkdir -p $DOCKERVMDIR/state
 
 docker run -itd \
 --net=host \
@@ -39,4 +39,4 @@ docker run -itd \
 -v $DOCKERVMDIR/var/log/hadoop-yarn:/var/log/hadoop-yarn \
 -v $DOCKERVMDIR/state:/root/state \
 -v /data/dfs:/data1/dfs \
-lambda:5000/hadoop-base:x8
+lambda:5000/hadoop-base:x9.1

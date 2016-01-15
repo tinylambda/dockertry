@@ -97,6 +97,7 @@ class Hadoop(Service):
                     self.makedir((dfs_namenode_name_dir, 'hdfs:hdfs', '700'))
             
             ZKFC_FORMATED = '/root/state/zkfc_formated.log'
+            ZKFC_START_CMD = 'service hadoop-hdfs-zkfc restart'
             if NAMENODE_SERVICE.upper() == 'MASTER':
                 NAMENODE_FORMATED = '/root/state/namenode_formated.log'
                 if not self.pathexists(NAMENODE_FORMATED): # 如果namenode未被初始化，先执行格式化操作
@@ -128,7 +129,13 @@ class Hadoop(Service):
                         with open(ZKFC_FORMATED, 'w') as state_file:
                             state_file.write(self.get_now())
                     else:
-                        self.fail('Failed to init ZKFC: ' + str(statusoutput))                        
+                        self.fail('Failed to init ZKFC: ' + str(statusoutput)) 
+                
+                statusoutput = self.execute_cmd(ZKFC_START_CMD)
+                if statusoutput[0] == 0:
+                    self.success(str(statusoutput))
+                else:
+                    self.fail('Failed to start ZKFC: ' + str(statusoutput))                        
                 
                 # 建立相关HDFS的目录，并设置相应权限
                 self.execute_cmd('sudo -u hdfs hadoop fs -mkdir /tmp')
@@ -144,14 +151,11 @@ class Hadoop(Service):
             elif NAMENODE_SERVICE.upper() == 'STANDBY':
                 self.execute_cmd('sudo -u hdfs hdfs namenode -bootstrapStandby')
                 self.execute_cmd('service hadoop-hdfs-namenode restart')
-            
-            # 至此，ZKFC已经格式化完毕，需要启动ZKFC服务，由于ACTIVE和STANDBY都需要启动ZKFC服务，所以将其放置到外层
-            ZKFC_START_CMD = 'service hadoop-hdfs-zkfc restart'
-            statusoutput = self.execute_cmd(ZKFC_START_CMD)
-            if statusoutput[0] == 0:
-                self.success(str(statusoutput))
-            else:
-                self.fail('Failed to start ZKFC: ' + str(statusoutput))             
+                statusoutput = self.execute_cmd(ZKFC_START_CMD)
+                if statusoutput[0] == 0:
+                    self.success(str(statusoutput))
+                else:
+                    self.fail('Failed to start ZKFC: ' + str(statusoutput))             
         
         if DATANODE_SERVICE is not None:
             # 在到达这步的时候，我们必须确定NameNode的相关服务都已经搞定了，这一步只需要建立相关目录、设置好拥有者和权限位之后启动服务即可
