@@ -49,7 +49,7 @@ class Zookeeper(Service):
             ZK_IS_INIT = '/root/state/zkinit.log'
             if not self.pathexists(ZK_IS_INIT): # 判断Zookeeper是否需要执行初始化服务
                 self.success('Zookeeper not initialized, initialize it first...')
-                ZK_INIT_CMD = '/etc/init.d/zookeeper-server init --force --myid=%(ser)s' % {'ser': ser}
+                ZK_INIT_CMD = 'service zookeeper-server init --force --myid=%(ser)s' % {'ser': ser}
                 statusoutput = self.execute_cmd(ZK_INIT_CMD)
                 if statusoutput[0] == 0: # 如果初始化操作正常，那么打上相应的已经初始化的标记
                     with open(ZK_IS_INIT, 'w') as zk_is_init_file:
@@ -57,7 +57,7 @@ class Zookeeper(Service):
                 else:
                     self.fail('Failed to init zookeeper: ' + str(statusoutput))
             # 如果目录都已经设置好，环境变量也符合要求，同时初始化也正常，那下一步就要启动Zookeeper服务    
-            ZK_START_CMD = '/etc/init.d/zookeeper-server restart'
+            ZK_START_CMD = 'service zookeeper-server restart'
             statusoutput = self.execute_cmd(ZK_START_CMD)
             if statusoutput[0] == 0:
                 self.success(str(statusoutput))
