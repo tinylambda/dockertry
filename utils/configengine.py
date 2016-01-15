@@ -18,6 +18,7 @@ class ConfigEngine(object):
         
     def waiting(self):
         while True:
+            print('Waiting...')
             time.sleep(5)
     
     def configure(self):
