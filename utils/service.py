@@ -36,7 +36,7 @@ class Service(object):
         MEM_TUPLE = MEM_STR.split(" ")
         MEM_NUM = 0
         if MEM_TUPLE[1].lower() == 'kb': # 目前只处理这种情况，后来可以扩展这里的处理过程
-            MEM_NUM = int(MEM_TUPLE) / 1024 # MB
+            MEM_NUM = int(MEM_TUPLE[0]) / 1024 # MB
         
         #  默认情况下，使用容器的全部资源作为可分配的资源，如果要调整，需要根据传入的某种策略来调整
         return {'YARN_NODEMANAGER_RESOURCE_CPU_VCORES': CPU_NUM, 
