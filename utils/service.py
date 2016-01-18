@@ -27,7 +27,7 @@ class Service(object):
         两个参数的设定，需要根据具体容器的硬件情况个性化地配置，所以需要CPU和内存相关的信息来做依据
         '''
         LOGIC_CPU_NUM_CMD = '''cat /proc/cpuinfo | grep processor |wc -l''' # 多少线程的CPU，比如4个物理核心，支持超线程技术，则为8个逻辑核心，在系统中体现为8个CPU
-        MEMORY_TOTAL_CMD = '''cat /proc/meminfo  | grep MemTotal| awk "{print $2, $3}"''' # 输出两列，第一列为数字值，第二列为单位（kb，gb）..
+        MEMORY_TOTAL_CMD = "cat /proc/meminfo  | grep MemTotal | awk '{print $2, $3}'" # 输出两列，第一列为数字值，第二列为单位（kb，gb）..
         CPU_INFO = self.execute_cmd(LOGIC_CPU_NUM_CMD)
         MEM_INFO = self.execute_cmd(MEMORY_TOTAL_CMD)
         CPU_NUM = int(CPU_INFO[1]) if CPU_INFO[0] == 0 else 1
