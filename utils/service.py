@@ -16,8 +16,31 @@ class Service(object):
     
     def __init__(self):
         env = {}
+        env.update(self.get_hardware_info())
         env.update(os.environ)
         self.ENV = env # env包含了类似于控制指令的环境变量
+    
+    def get_hardware_info(self):
+        '''
+        YARN_NODEMANAGER_RESOURCE_CPU_VCORES
+        YARN_NODEMANAGER_RESOURCE_MEMOERY_MB
+        两个参数的设定，需要根据具体容器的硬件情况个性化地配置，所以需要CPU和内存相关的信息来做依据
+        '''
+        LOGIC_CPU_NUM_CMD = '''cat /proc/cpuinfo | grep processor |wc -l''' # 多少线程的CPU，比如4个物理核心，支持超线程技术，则为8个逻辑核心，在系统中体现为8个CPU
+        MEMORY_TOTAL_CMD = '''cat /proc/meminfo  | grep MemTotal| awk "{print $2, $3}"''' # 输出两列，第一列为数字值，第二列为单位（kb，gb）..
+        CPU_INFO = self.execute_cmd(LOGIC_CPU_NUM_CMD)
+        MEM_INFO = self.execute_cmd(MEMORY_TOTAL_CMD)
+        CPU_NUM = int(CPU_INFO[1]) if CPU_INFO[0] == 0 else 1
+        MEM_STR = MEM_INFO[1] if MEM_INFO[0] == 0 else "0 kb"
+        # 将内存转化成MB单位，然后再转其它单位
+        MEM_TUPLE = MEM_STR.split(" ")
+        MEM_NUM = 0
+        if MEM_TUPLE[1].lower() == 'kb': # 目前只处理这种情况，后来可以扩展这里的处理过程
+            MEM_NUM = int(MEM_TUPLE) / 1024 # MB
+        
+        #  默认情况下，使用容器的全部资源作为可分配的资源，如果要调整，需要根据传入的某种策略来调整
+        return {'YARN_NODEMANAGER_RESOURCE_CPU_VCORES': CPU_NUM, 
+                'YARN_NODEMANAGER_RESOURCE_MEMOERY_MB': MEM_NUM}
     
     def fail(self, msg):
         sys.exit(msg)
