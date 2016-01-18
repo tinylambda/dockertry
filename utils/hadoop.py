@@ -147,7 +147,7 @@ class Hadoop(Service):
                 self.execute_cmd('sudo -u hdfs hadoop fs -chown hive /user/hive')
                 
             elif NAMENODE_SERVICE.upper() == 'STANDBY':
-                self.execute_cmd('sudo -u hdfs hdfs namenode -bootstrapStandby')
+                self.execute_cmd('sudo -u hdfs hdfs namenode -bootstrapStandby -force') # format anyway
                 self.execute_cmd('service hadoop-hdfs-namenode restart')
                 statusoutput = self.execute_cmd(ZKFC_START_CMD)
                 if statusoutput[0] == 0:
