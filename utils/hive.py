@@ -54,7 +54,7 @@ class Hive(Service):
                 self.execute_cmd('''echo "CREATE DATABASE metastore;" | mysql -uroot -p"%s"''' % HIVE_MYSQL_ROOT_PASSWORD) # 创建mysql中元数据库
                 self.execute_cmd('''echo -e "USE metastore;\nSOURCE /usr/lib/hive/scripts/metastore/upgrade/mysql/hive-schema-1.1.0.mysql.sql" | mysql -uroot -p"%s"''' % HIVE_MYSQL_ROOT_PASSWORD)
                 self.execute_cmd('''echo "CREATE USER '%s'@'%s' IDENTIFIED BY '%s'" | mysql -uroot -p"%s"''' % (HIVE_MYSQL_USER, HIVE_METASTORE_SERVER, HIVE_MYSQL_PASSWORD, HIVE_MYSQL_ROOT_PASSWORD))
-                with open(HIVE_MYSQL_INITED) as hive_mysql_inited:
+                with open(HIVE_MYSQL_INITED, 'w') as hive_mysql_inited:
                     hive_mysql_inited.write(self.get_now())
             else:
                 self.execute_cmd('service  mysqld restart') # 直接启动mysql服务
