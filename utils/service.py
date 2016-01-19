@@ -60,7 +60,9 @@ class Service(object):
     
     def execute_cmd(self, cmd):
         self.success('Executing CMD: [%s] ...' % cmd)
-        return commands.getstatusoutput(cmd)
+        statusoutput = commands.getstatusoutput(cmd)
+        self.success(str(statusoutput))
+        return statusoutput
     
     def get_now(self):
         return str(datetime.datetime.now())
