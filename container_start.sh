@@ -11,6 +11,7 @@ docker run -itd \
 -v $DOCKERVMDIR/tmp/:/tmp/ \
 -v $DOCKERVMDIR/var/log/zookeeper/:/var/log/zookeeper/  \
 -v $DOCKERVMDIR/var/lib/zookeeper:/var/lib/zookeeper/ \
+-v $DOCKERVMDIR/var/lib/mysql:/var/lib/mysql/ \
 -v $DOCKERVMDIR/var/log/hadoop-0.20-mapreduce:/var/log/hadoop-0.20-mapreduce \
 -v $DOCKERVMDIR/var/log/hadoop-hdfs:/var/log/hadoop-hdfs \
 -v $DOCKERVMDIR/var/log/hadoop-mapreduce:/var/log/hadoop-mapreduce \
@@ -32,6 +33,7 @@ docker run -itd \
 -v $DOCKERVMDIR/tmp/:/tmp/ \
 -v $DOCKERVMDIR/var/log/zookeeper/:/var/log/zookeeper/  \
 -v $DOCKERVMDIR/var/lib/zookeeper:/var/lib/zookeeper/ \
+-v $DOCKERVMDIR/var/lib/mysql:/var/lib/mysql/ \
 -v $DOCKERVMDIR/var/log/hadoop-0.20-mapreduce:/var/log/hadoop-0.20-mapreduce \
 -v $DOCKERVMDIR/var/log/hadoop-hdfs:/var/log/hadoop-hdfs \
 -v $DOCKERVMDIR/var/log/hadoop-mapreduce:/var/log/hadoop-mapreduce \

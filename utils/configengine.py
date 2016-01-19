@@ -9,14 +9,14 @@ import time
 from zookeeper import Zookeeper
 from hadoop import Hadoop
 from hbase import HBase
-from mysql import MySQL
+from utils.hive import Hive
 
 class ConfigEngine(object):
     def __init__(self):
         self.zookeeper = Zookeeper()
         self.hadoop = Hadoop()
         self.hbase = HBase()
-        self.mysql = MySQL()
+        self.hive = Hive()
         
     def waiting(self):
         while True:
@@ -27,7 +27,7 @@ class ConfigEngine(object):
         self.zookeeper.configure()
         self.hadoop.configure()
         self.hbase.configure()
-        self.mysql.configure()
+        self.hive.configure()
         
 if __name__ == '__main__':
     configEngine = ConfigEngine()

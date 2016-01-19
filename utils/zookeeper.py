@@ -38,7 +38,7 @@ class Zookeeper(Service):
     def configure(self):
         self.ensure_dirs()
         
-        # 动态渲染配置文件，首先是以系统环境变量为基础生成一个，配置上下文，这个配置每台服务器可能都有区别，所以最好是在一个单独的方法中实现
+        # 动态渲染配置文件，首先是以系统环境变量为基础生成一个配置上下文，这个配置每台服务器可能都有区别，所以最好是在一个单独的方法中实现
         render_env = self.get_render_env()
         self.render(render_env)
         
