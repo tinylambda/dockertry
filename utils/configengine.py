@@ -9,7 +9,7 @@ import time
 from zookeeper import Zookeeper
 from hadoop import Hadoop
 from hbase import HBase
-from utils.hive import Hive
+from hive import Hive
 
 class ConfigEngine(object):
     def __init__(self):

@@ -34,7 +34,7 @@ class Hive(Service):
         self.ensure_dirs()
         
         render_env = self.get_render_env()
-        self.render(render_env)
+        self.render(render_env) # 无论怎样都需要维持配置的一致性
         
         HIVE_MYSQL_USER = self.ENV.get('HIVE_MYSQL_USER')
         HIVE_MYSQL_PASSWORD = self.ENV.get('HIVE_MYSQL_PASSWORD')
