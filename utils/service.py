@@ -61,7 +61,8 @@ class Service(object):
     def execute_cmd(self, cmd):
         self.success('Executing CMD: [%s] ...' % cmd)
         statusoutput = commands.getstatusoutput(cmd)
-        self.success(str(statusoutput))
+        self.success('Return Code :' + statusoutput[0])
+        self.success('Return output :' + statusoutput[1])
         return statusoutput
     
     def get_now(self):
