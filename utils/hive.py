@@ -42,7 +42,7 @@ class Hive(Service):
         
         HIVE_MYSQL_SERVICE = self.ENV.get('HIVE_MYSQL_SERVICE', None)
         HIVE_METASTORE_SERVICE = self.ENV.get('HIVE_METASTORE_SERVICE', None)
-        HIVE_SERVER2_SERVICE = self.env.get('HIVE_SERVER2_SERVICE', None)
+        HIVE_SERVER2_SERVICE = self.ENV.get('HIVE_SERVER2_SERVICE', None)
         
         if HIVE_MYSQL_SERVICE is not None:
             HIVE_MYSQL_ROOT_PASSWORD = self.ENV.get('HIVE_MYSQL_ROOT_PASSWORD')
