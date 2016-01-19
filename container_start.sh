@@ -40,4 +40,4 @@ docker run -itd \
 -v $DOCKERVMDIR/var/log/hadoop-yarn:/var/log/hadoop-yarn \
 -v $DOCKERVMDIR/state:/root/state \
 -v /data/dfs:/data1/dfs \
-lambda:5000/hadoop-base:x9.9.4
+lambda:5000/hadoop-base:x9.9.5
