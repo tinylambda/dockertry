@@ -145,6 +145,8 @@ class Hadoop(Service):
                 self.execute_cmd('sudo -u hdfs hadoop fs -chown yarn:mapred /var/log/hadoop-yarn')
                 self.execute_cmd('sudo -u hdfs hadoop fs -mkdir  /user/hive')
                 self.execute_cmd('sudo -u hdfs hadoop fs -chown hive /user/hive')
+                self.execute_cmd('sudo -u hdfs hadoop fs -mkdir  /user/root')
+                self.execute_cmd('sudo -u hdfs hadoop fs -chown root /user/root')
                 
             elif NAMENODE_SERVICE.upper() == 'STANDBY':
                 self.execute_cmd('sudo -u hdfs hdfs namenode -bootstrapStandby -force') # format anyway
