@@ -9,4 +9,5 @@
 - Hivemetastore (mysql)
 - Hiveserver2
 - Spark (yarn)
-
+- HBase Master (problems in auto start)
+- HBase Regionserver (problems in auto start)
