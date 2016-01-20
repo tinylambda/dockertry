@@ -41,4 +41,4 @@ docker run -itd \
 -v $DOCKERVMDIR/var/log/hbase:/var/log/hbase \
 -v $DOCKERVMDIR/state:/root/state \
 -v /data/dfs:/data1/dfs \
-lambda:5000/hadoop-base:x9.9.7
+lambda:5000/hadoop-base:x9.9.9

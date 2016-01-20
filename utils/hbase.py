@@ -13,7 +13,7 @@ class HBase(Service):
     
     CONF_TMPL_DIR = '/root/templates/hbase.conf.my_cluster'
     CONF_DIR = '/etc/hbase/conf.my_cluster'
-    CONF_FILES = ('hbase-site.xml')
+    CONF_FILES = ('hbase-site.xml',)
     
     REQUIRED_ENVS = ['FS_DEFAULTFS',
                      'HBASE_ZOOKEEPER_QUORUM',
