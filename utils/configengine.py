@@ -26,7 +26,7 @@ class ConfigEngine(object):
     def configure(self):
         self.zookeeper.configure()
         self.hadoop.configure()
-        self.hbase.configure()
+#         self.hbase.configure()
         self.hive.configure()
         
 if __name__ == '__main__':
