@@ -10,6 +10,7 @@ from zookeeper import Zookeeper
 from hadoop import Hadoop
 from hbase import HBase
 from hive import Hive
+from ignite import Ignite
 
 class ConfigEngine(object):
     def __init__(self):
@@ -17,6 +18,7 @@ class ConfigEngine(object):
         self.hadoop = Hadoop()
         self.hbase = HBase()
         self.hive = Hive()
+        self.ignite = Ignite()
         
     def waiting(self):
         while True:
@@ -28,6 +30,7 @@ class ConfigEngine(object):
         self.hadoop.configure()
 #         self.hbase.configure()
         self.hive.configure()
+        self.ignite.configure()
         
 if __name__ == '__main__':
     configEngine = ConfigEngine()
