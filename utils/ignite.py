@@ -7,4 +7,9 @@ Created on 2016年1月19日
 from service import Service
 
 class Ignite(Service):
-    pass
+
+    def __init__(self):
+        Service.__init__(self)
+    
+    def configure(self):
+        pass

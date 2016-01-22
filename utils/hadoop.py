@@ -15,6 +15,7 @@ class Hadoop(Service):
         ("/var/log/hadoop-hdfs", "hdfs:hadoop", "755"), # hdfs的日志目录
         ("/var/log/hadoop-mapreduce", "mapred:hadoop", "755"), # mr 2日志目录
         ("/var/log/hadoop-yarn", "yarn:hadoop", "755") # yarn日志目录
+        ("/var/log/hadoop-httpfs", "httpfs:httpfs", "755") # httpfs日志目录
     ]
     
     CONF_TMPL_DIR = '/root/templates/hadoop.conf.my_cluster'
@@ -72,6 +73,7 @@ class Hadoop(Service):
         NODEMANAGER_SERVICE = self.ENV.get('NODEMANAGER_SERVICE', None)
         JOBHISTORY_SERVICE = self.ENV.get('JOBHISTORY_SERVICE', None)
         JOURNALNODE_SERVICE = self.ENV.get('JOURNALNODE_SERVICE', None)
+        HTTPFS_SERVICE = self.ENV.get('HTTPFS_SERVICE', None)
         
         # 启动JournalNode进程
         if JOURNALNODE_SERVICE is not None:
@@ -80,11 +82,7 @@ class Hadoop(Service):
             for dfs_journalnode_edits_dir in DFS_JOURNALNODE_EDITS_DIR_ARR:
                 self.makedir((dfs_journalnode_edits_dir, 'hdfs:hdfs', '755'))
             JOURNALNODE_START_CMD = 'service hadoop-hdfs-journalnode restart'
-            statusoutput = self.execute_cmd(JOURNALNODE_START_CMD)
-            if statusoutput[0] == 0:
-                self.success(str(statusoutput))
-            else:
-                self.fail('Failed to format journalnode: ' + str(statusoutput))
+            self.execute_cmd(JOURNALNODE_START_CMD)
         
         # 启动NameNode
         if NAMENODE_SERVICE is not None:
@@ -99,22 +97,15 @@ class Hadoop(Service):
             if NAMENODE_SERVICE.upper() == 'MASTER':
                 NAMENODE_FORMATED = '/root/state/namenode_formated.log'
                 if not self.pathexists(NAMENODE_FORMATED): # 如果namenode未被初始化，先执行格式化操作
-                    self.success('Namenode formating...')
                     NAMENODE_FORMAT_CMD = 'sudo -u hdfs hdfs namenode -format'
-                    statusoutput = self.execute_cmd(NAMENODE_FORMAT_CMD)
-                    if statusoutput[0] == 0: # 如果初始化操作正常，那么打上相应的已经初始化的标记
-                        with open(NAMENODE_FORMATED, 'w') as namenode_formated_file:
-                            namenode_formated_file.write(self.get_now())
-                    else:
-                        self.fail('Failed to format namenode: ' + str(statusoutput))
+                    self.execute_cmd(NAMENODE_FORMAT_CMD)
+                    #如果初始化操作正常，那么打上相应的已经初始化的标记
+                    with open(NAMENODE_FORMATED, 'w') as namenode_formated_file:
+                        namenode_formated_file.write(self.get_now())
                 
                 # 现在已经能够保证名字节点被成功格式化，下面启动namenode服务进程(注意，在部署的时候，需要先在其它服务器上启动Journalnode服务进程)
                 NAMENODE_START_CMD = 'service hadoop-hdfs-namenode restart'
-                statusoutput = self.execute_cmd(NAMENODE_START_CMD)
-                if statusoutput[0] == 0:
-                    self.success(str(statusoutput))
-                else:
-                    self.fail('Failed to start namenode: ' + str(statusoutput))
+                self.execute_cmd(NAMENODE_START_CMD)
                 
                 # 如果格式化Namenode正常，则启动该节点的ZKFC服务，以用来自动切换坏掉的Namenode服务
                 # 首先，要判断是否已经在Zookeeper中格式化了存储结构，如果没有需要格式化一下，本操作规定只在master
@@ -122,18 +113,12 @@ class Hadoop(Service):
                 if not self.pathexists(ZKFC_FORMATED):
                     self.success('ZKFC initializing...')
                     ZKFC_FORMAT_CMD = 'hdfs zkfc -formatZK'
-                    statusoutput = self.execute_cmd(ZKFC_FORMAT_CMD)
-                    if statusoutput[0] == 0: # 如果初始化操作正常，那么打上相应的已经初始化的标记
-                        with open(ZKFC_FORMATED, 'w') as state_file:
-                            state_file.write(self.get_now())
-                    else:
-                        self.fail('Failed to init ZKFC: ' + str(statusoutput)) 
+                    self.execute_cmd(ZKFC_FORMAT_CMD)
+                    # 如果初始化操作正常，那么打上相应的已经初始化的标记
+                    with open(ZKFC_FORMATED, 'w') as state_file:
+                        state_file.write(self.get_now())
                 
-                statusoutput = self.execute_cmd(ZKFC_START_CMD)
-                if statusoutput[0] == 0:
-                    self.success(str(statusoutput))
-                else:
-                    self.fail('Failed to start ZKFC: ' + str(statusoutput))                        
+                self.execute_cmd(ZKFC_START_CMD)                     
                 
                 # 建立相关HDFS的目录，并设置相应权限
                 self.execute_cmd('sudo -u hdfs hadoop fs -mkdir /tmp')
@@ -151,11 +136,7 @@ class Hadoop(Service):
             elif NAMENODE_SERVICE.upper() == 'STANDBY':
                 self.execute_cmd('sudo -u hdfs hdfs namenode -bootstrapStandby -force') # format anyway
                 self.execute_cmd('service hadoop-hdfs-namenode restart')
-                statusoutput = self.execute_cmd(ZKFC_START_CMD)
-                if statusoutput[0] == 0:
-                    self.success(str(statusoutput))
-                else:
-                    self.fail('Failed to start ZKFC: ' + str(statusoutput))             
+                self.execute_cmd(ZKFC_START_CMD)            
         
         if DATANODE_SERVICE is not None:
             # 在到达这步的时候，我们必须确定NameNode的相关服务都已经搞定了，这一步只需要建立相关目录、设置好拥有者和权限位之后启动服务即可
@@ -166,20 +147,12 @@ class Hadoop(Service):
                 self.makedir((dfs_datanode_data_dir, 'hdfs:hdfs', '700'))
             
             DATANODE_START_CMD = 'service hadoop-hdfs-datanode restart'
-            statusoutput = self.execute_cmd(DATANODE_START_CMD)
-            if statusoutput[0] == 0:
-                self.success(str(statusoutput))
-            else:
-                self.fail('Failed to start datanode: ' + str(statusoutput))
+            self.execute_cmd(DATANODE_START_CMD)
         
         if RESOURCEMANAGER_SERVICE is not None:
             # 设置并启动YARN的资源管理节点，
             RESOURCEMANAGER_START_CMD = 'service hadoop-yarn-resourcemanager restart'
-            statusoutput = self.execute_cmd(RESOURCEMANAGER_START_CMD)
-            if statusoutput[0] == 0:
-                self.success(str(statusoutput))
-            else:
-                self.fail('Failed to start resourcemanager service: ' + str(statusoutput))
+            self.execute_cmd(RESOURCEMANAGER_START_CMD)
         
         if NODEMANAGER_SERVICE is not None:
             # 创建nodemanager所需要的本地工作目录和日志目录，设置好相应的拥有者和权限之后，启动服务
@@ -194,17 +167,14 @@ class Hadoop(Service):
                 self.makedir((yarn_nodemanager_log_dir, 'yarn:yarn', '755'))
             
             NODEMANAGER_START_CMD = 'service hadoop-yarn-nodemanager restart'
-            statusoutput = self.execute_cmd(NODEMANAGER_START_CMD)
-            if statusoutput[0] == 0:
-                self.success(str(statusoutput))
-            else:
-                self.fail('Failed to start nodemanager service: ' + str(statusoutput))
-        
+            self.execute_cmd(NODEMANAGER_START_CMD)
+
         if JOBHISTORY_SERVICE is not None:
             # 启动MapReduce Jobhistory服务
             JOBHISTORY_START_CMD = 'service hadoop-mapreduce-historyserver restart'
-            statusoutput = self.execute_cmd(JOBHISTORY_START_CMD)
-            if statusoutput[0] == 0:
-                self.success(str(statusoutput))
-            else:
-                self.fail('Failed to start JOBHISTORY service: ' + str(statusoutput))
+            self.execute_cmd(JOBHISTORY_START_CMD)
+        
+        if HTTPFS_SERVICE is not None:
+            #  启动HTTPFS服务
+            HTTPFS_START_CMD = 'service hadoop-httpfs restart'
+            self.execute_cmd(HTTPFS_START_CMD)
