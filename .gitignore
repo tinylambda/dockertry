@@ -1,0 +1,15 @@
+# Created by https://www.gitignore.io/api/django
+
+### Django ###
+.DS_Store
+.classpath
+.project
+.settings
+*.pydevproject
+*.project
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+media
